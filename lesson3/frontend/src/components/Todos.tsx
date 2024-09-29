@@ -1,63 +1,64 @@
 import { Box, List, ListItem, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid, Paper } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import SubmitCat from "./SubmitCat";
+import SubmitTodo from "./SubmitTodos";
 
-type Cat = {
+type Todo = {
   id: string;
-  name: string;
+  title: string;
+  priority: number;
   createdAt: number;
   updatedAt: number | null;
   deleted: boolean;
 };
 
-const Cats = () => {
-  const [cats, setCats] = useState<Cat[]>([]);
+const Todos = () => {
+  const [todos, setTodos] = useState<Todo[]>([]);
   const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [selectedCat, setSelectedCat] = useState<Cat | null>(null);
-  const [newName, setNewName] = useState("");
+  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
+  const [newTitle, setNewTitle] = useState("");
 
-  const fetchCats = async () => {
-    const response = await fetch("http://localhost:8080/cats");
+  const fetchTodos = async () => {
+    const response = await fetch("http://localhost:8080/todos");
     const data = await response.json();
-    setCats(data);
+    setTodos(data);
   };
 
   useEffect(() => {
-    fetchCats();
+    fetchTodos();
   }, []);
 
-  // DELETE cat function
-  const deleteCat = async (id: string) => {
-    await fetch(`http://localhost:8080/cats/${id}`, {
+  // DELETE todo function
+  const deleteTodo = async (id: string) => {
+    await fetch(`http://localhost:8080/todos/${id}`, {
       method: "DELETE",
     });
-    fetchCats();
+    fetchTodos();
   };
 
-  // OPEN edit dialog for renaming cat
-  const openEditCatDialog = (cat: Cat) => {
-    setSelectedCat(cat);
-    setNewName(cat.name);
+  // OPEN edit dialog for renaming todo
+  const openEditTodoDialog = (todo: Todo) => {
+    setSelectedTodo(todo);
+    setNewTitle(todo.title);
     setOpenEditDialog(true);
   };
 
   // CLOSE edit dialog
   const closeEditDialog = () => {
     setOpenEditDialog(false);
-    setSelectedCat(null);
+    setSelectedTodo(null);
   };
 
-  // UPDATE cat name function
-  const updateCatName = async () => {
-    if (selectedCat && newName.trim() !== "") {
-      await fetch(`http://localhost:8080/cats/${selectedCat.id}`, {
+  // UPDATE todo title function
+  const updateTodoTitle = async () => {
+    if (selectedTodo && newTitle.trim() !== "") {
+      await fetch(`http://localhost:8080/todos/${selectedTodo.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name: newName }),
+        body: JSON.stringify({ title: newTitle }),
       });
-      fetchCats();
+      fetchTodos();
       closeEditDialog();
     }
   };
@@ -65,46 +66,49 @@ const Cats = () => {
   return (
     <Box>
       <Typography variant="h3" gutterBottom>
-        Cats
+        Todos
       </Typography>
       <List>
-        {cats.map((cat) => (
-          <ListItem key={cat.id}>
+        {todos.map((todo) => (
+          <ListItem key={todo.id}>
             <Paper elevation={3} sx={{ padding: 2, width: '100%' }}>
               <Grid container spacing={2}>
-                {/* Cat Name */}
+                {/* Todo Title */}
                 <Grid item xs={12} md={3}>
                   <Typography variant="h6" color="primary">
-                    {cat.name}
+                    {todo.title}
                   </Typography>
                 </Grid>
 
-                {/* Cat Information */}
+                {/* Todo Information */}
                 <Grid item xs={12} md={6}>
                   <Typography variant="body1">
-                    <strong>ID:</strong> {cat.id}
+                    <strong>ID:</strong> {todo.id}
                   </Typography>
                   <Typography variant="body1">
-                    <strong>Created At:</strong> {new Date(cat.createdAt).toLocaleString()}
+                    <strong>Priority:</strong> {todo.priority}
                   </Typography>
-                  {cat.updatedAt && (
+                  <Typography variant="body1">
+                    <strong>Created At:</strong> {new Date(todo.createdAt).toLocaleString()}
+                  </Typography>
+                  {todo.updatedAt && (
                     <Typography variant="body1">
-                      <strong>Updated At:</strong> {new Date(cat.updatedAt).toLocaleString()}
+                      <strong>Updated At:</strong> {new Date(todo.updatedAt).toLocaleString()}
                     </Typography>
                   )}
                   <Typography variant="body1">
-                    <strong>Deleted:</strong> {cat.deleted ? "Yes" : "No"}
+                    <strong>Deleted:</strong> {todo.deleted ? "Yes" : "No"}
                   </Typography>
                 </Grid>
 
                 {/* Action Buttons */}
                 <Grid item xs={12} md={3} sx={{ display: "flex", justifyContent: "flex-end" }}>
                   {/* Edit Button */}
-                  <Button variant="contained" color="primary" onClick={() => openEditCatDialog(cat)} sx={{ mr: 1 }}>
+                  <Button variant="contained" color="primary" onClick={() => openEditTodoDialog(todo)} sx={{ mr: 1 }}>
                     Edit
                   </Button>
                   {/* Delete Button */}
-                  <Button variant="contained" color="secondary" onClick={() => deleteCat(cat.id)}>
+                  <Button variant="contained" color="secondary" onClick={() => deleteTodo(todo.id)}>
                     Delete
                   </Button>
                 </Grid>
@@ -114,25 +118,25 @@ const Cats = () => {
         ))}
       </List>
 
-      {/* Submit new cat component */}
-      <SubmitCat fetchCats={fetchCats} />
+      {/* Submit new todo component */}
+      <SubmitTodo fetchTodos={fetchTodos} />
 
-      {/* Edit Cat Dialog */}
+      {/* Edit Todo Dialog */}
       <Dialog open={openEditDialog} onClose={closeEditDialog}>
-        <DialogTitle>Edit Cat Name</DialogTitle>
+        <DialogTitle>Edit Todo Title</DialogTitle>
         <DialogContent>
           <TextField
-            label="New Name"
+            label="New Title"
             fullWidth
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
+            value={newTitle}
+            onChange={(e) => setNewTitle(e.target.value)}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={closeEditDialog} color="primary">
             Cancel
           </Button>
-          <Button onClick={updateCatName} color="primary">
+          <Button onClick={updateTodoTitle} color="primary">
             Save
           </Button>
         </DialogActions>
@@ -141,4 +145,4 @@ const Cats = () => {
   );
 };
 
-export default Cats;
+export default Todos;
