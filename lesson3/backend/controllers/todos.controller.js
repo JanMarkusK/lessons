@@ -1,3 +1,8 @@
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const SECRET_KEY = 'your_secret_key'; 
+
+
 const todos = [
    {
      id: "1",
@@ -9,6 +14,38 @@ const todos = [
    }
  ];
  
+ // GET: Loon JWT token, võtan nime bodyst
+exports.getToken = (req, res) => {
+   const { name } = req.body;
+ 
+   if (!name) {
+     return res.status(400).send({ message: 'Name is required to generate token' });
+   }
+ 
+   // Tokeni loomine
+   const token = jwt.sign({ name }, SECRET_KEY, { expiresIn: '1h' });
+   res.send({ token });
+ };
+ 
+ // POST: Tokeni valideerimine
+ exports.verifyToken = (req, res) => {
+   const { token } = req.body;
+ 
+   if (!token) {
+     return res.status(400).send({ message: 'Token is required' });
+   }
+ 
+   // Tokeni valideerimine
+   jwt.verify(token, SECRET_KEY, (err, decoded) => {
+     if (err) {
+       return res.status(401).send({ message: 'Invalid token' });
+     }
+ 
+     // Kui token on korrektne, saadab tagasi tokenist saadud info
+     res.send({ message: 'Token is valid', data: decoded });
+   });
+ };
+
  exports.create = (req, res) => {
    const { title, priority } = req.body;
  

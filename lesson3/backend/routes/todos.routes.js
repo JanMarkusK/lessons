@@ -9,7 +9,11 @@ const {
 // Üldine route middleware
 router.use(todosRouteMiddleware);
 
+//JWT routeid
+router.get('/token', todosController.getToken); 
+router.post('/verify', todosController.verifyToken); 
 
+//Todo routeid
 router.get("/", todosGetRouteMiddleware, todosController.read);
 router.post("/", todosController.create);
 router.put("/:id", todosController.update);
