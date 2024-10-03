@@ -1,6 +1,32 @@
-import { Box, List, ListItem, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Grid, Paper } from "@mui/material";
+import {
+  Box,
+  List,
+  ListItem,
+  Typography,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Grid,
+  Paper,
+  ThemeProvider,
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import SubmitTodo from "./SubmitTodos";
+import { createTheme } from "@mui/material/styles";
+
+let theme = createTheme({
+  palette: {
+    primary: {
+      main: "#a037ef",
+    },
+    secondary: {
+      main: "#ef37e3",
+    },
+  },
+});
 
 type Todo = {
   id: string;
@@ -64,84 +90,102 @@ const Todos = () => {
   };
 
   return (
-    <Box>
-      <Typography variant="h3" gutterBottom>
-        Todos
-      </Typography>
-      <List>
-        {todos.map((todo) => (
-          <ListItem key={todo.id}>
-            <Paper elevation={3} sx={{ padding: 2, width: '100%' }}>
-              <Grid container spacing={2}>
-                {/* Todo Title */}
-                <Grid item xs={12} md={3}>
-                  <Typography variant="h6" color="primary">
-                    {todo.title}
-                  </Typography>
-                </Grid>
-
-                {/* Todo Information */}
-                <Grid item xs={12} md={6}>
-                  <Typography variant="body1">
-                    <strong>ID:</strong> {todo.id}
-                  </Typography>
-                  <Typography variant="body1">
-                    <strong>Priority:</strong> {todo.priority}
-                  </Typography>
-                  <Typography variant="body1">
-                    <strong>Created At:</strong> {new Date(todo.createdAt).toLocaleString()}
-                  </Typography>
-                  {todo.updatedAt && (
-                    <Typography variant="body1">
-                      <strong>Updated At:</strong> {new Date(todo.updatedAt).toLocaleString()}
+    <ThemeProvider theme={theme}>
+      <Box>
+        <Typography variant="h3" gutterBottom>
+          Todos
+        </Typography>
+        <List>
+          {todos.map((todo) => (
+            <ListItem key={todo.id}>
+              <Paper elevation={3} sx={{ padding: 2, width: "100%" }}>
+                <Grid container spacing={2}>
+                  {/* Todo Title */}
+                  <Grid item xs={12} md={3}>
+                    <Typography variant="h6" color="primary">
+                      {todo.title}
                     </Typography>
-                  )}
-                  <Typography variant="body1">
-                    <strong>Deleted:</strong> {todo.deleted ? "Yes" : "No"}
-                  </Typography>
+                  </Grid>
+
+                  {/* Todo Information */}
+                  <Grid item xs={12} md={6}>
+                    <Typography variant="body1">
+                      <strong>ID:</strong> {todo.id}
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>Priority:</strong> {todo.priority}
+                    </Typography>
+                    <Typography variant="body1">
+                      <strong>Created At:</strong>{" "}
+                      {new Date(todo.createdAt).toLocaleString()}
+                    </Typography>
+                    {todo.updatedAt && (
+                      <Typography variant="body1">
+                        <strong>Updated At:</strong>{" "}
+                        {new Date(todo.updatedAt).toLocaleString()}
+                      </Typography>
+                    )}
+                    <Typography variant="body1">
+                      <strong>Deleted:</strong> {todo.deleted ? "Yes" : "No"}
+                    </Typography>
+                  </Grid>
+
+                  {/* Action Buttons */}
+                  <Grid
+                    item
+                    xs={12}
+                    md={3}
+                    sx={{ display: "flex", justifyContent: "flex-end" }}
+                  >
+                    {/* Edit Button */}
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => openEditTodoDialog(todo)}
+                      sx={{ mr: 1 }}
+                    >
+                      Edit
+                    </Button>
+                    {/* Delete Button */}
+                    <Button
+                      variant="contained"
+                      color="secondary"
+                      onClick={() => deleteTodo(todo.id)}
+                    >
+                      Delete
+                    </Button>
+                  </Grid>
                 </Grid>
+              </Paper>
+            </ListItem>
+          ))}
+        </List>
 
-                {/* Action Buttons */}
-                <Grid item xs={12} md={3} sx={{ display: "flex", justifyContent: "flex-end" }}>
-                  {/* Edit Button */}
-                  <Button variant="contained" color="primary" onClick={() => openEditTodoDialog(todo)} sx={{ mr: 1 }}>
-                    Edit
-                  </Button>
-                  {/* Delete Button */}
-                  <Button variant="contained" color="secondary" onClick={() => deleteTodo(todo.id)}>
-                    Delete
-                  </Button>
-                </Grid>
-              </Grid>
-            </Paper>
-          </ListItem>
-        ))}
-      </List>
+        {/* Submit new todo component */}
+        <SubmitTodo fetchTodos={fetchTodos} />
 
-      {/* Submit new todo component */}
-      <SubmitTodo fetchTodos={fetchTodos} />
-
-      {/* Edit Todo Dialog */}
-      <Dialog open={openEditDialog} onClose={closeEditDialog}>
-        <DialogTitle>Edit Todo Title</DialogTitle>
-        <DialogContent>
-          <TextField
-            label="New Title"
-            fullWidth
-            value={newTitle}
-            onChange={(e) => setNewTitle(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeEditDialog} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={updateTodoTitle} color="primary">
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
+        {/* Edit Todo Dialog */}
+        <Dialog open={openEditDialog} onClose={closeEditDialog}>
+          <DialogTitle>Edit Todo Title</DialogTitle>
+          <DialogContent>
+            <TextField
+              label="New Title"
+              fullWidth
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={closeEditDialog} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={updateTodoTitle} color="primary">
+              Save
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </Box>
+    </ThemeProvider>
   );
 };
 

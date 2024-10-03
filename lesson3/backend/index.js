@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 const morgan = require("morgan");
+const jwt = require("jsonwebtoken");
 const port = 8080;
 
 app.use(cors());
