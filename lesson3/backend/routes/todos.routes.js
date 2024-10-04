@@ -10,13 +10,28 @@ const {
 router.use(todosRouteMiddleware);
 
 //JWT routeid
-router.get('/token', todosController.getToken); 
-router.post('/verify', todosController.verifyToken); 
+router.get("/token", todosController.getToken);
+router.post("/verify", todosController.verifyToken);
 
 //Todo routeid
 router.get("/", todosGetRouteMiddleware, todosController.read);
-router.post("/", todosController.create);
-router.put("/:id", todosController.update);
+router.post("/", todosController.create, query("title").notEmpty(),(req, res) => {
+    const result = validationResult(req);
+    if (result.isEmpty()) {
+      return res.send(`Forgot title, ${req.query.title}!`);
+    }
+
+    res.send({ errors: result.array() });
+});
+
+router.put("/:id", todosController.update, query("title").notEmpty(),(req, res) => {
+   const result = validationResult(req);
+   if (result.isEmpty()) {
+     return res.send(`Forgot title, ${req.query.title}!`);
+   }
+
+   res.send({ errors: result.array() });
+});
 router.delete("/:id", todosController.delete);
 
 module.exports = router;

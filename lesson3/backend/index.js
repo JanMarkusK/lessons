@@ -1,4 +1,5 @@
 const express = require("express");
+const { query, validationResult } = require('express-validator');
 const cors = require("cors");
 const app = express();
 const morgan = require("morgan");
